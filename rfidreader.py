@@ -57,6 +57,7 @@ class RFIDReader(object):
 
     def __init__(self, port="/dev/ttyUSB0", baudrate=9600):
         self.port = port
+        self.dev = None
         self.baudrate = baudrate
 
     def open(self):
@@ -67,7 +68,8 @@ class RFIDReader(object):
                                  stopbits=1)
 
     def close(self):
-        self.dev.close()
+        if self.dev:
+            self.dev.close()
 
     def run(self, callback):
         """Constantly query the device and call `callback`

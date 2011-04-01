@@ -9,9 +9,18 @@ START_BYTE = 0x02
 STOP_BYTE = 0x03
 
 def to_rawbytes(serial_string):
+    """
+    Convert the encoding coming from the serial port
+    to raw bytes for easier manipulation. (The serial
+    device sends bytes ascii-encoded, i.e.: 0xA is encoded
+    as 'A')
+    """
     return [ord(x) for x in serial_string]
 
 class RFIDObject(object):
+    """
+    A single rfid read from the serial device
+    """
     def __init__(self, rawbytes):
         self.rawbytes = rawbytes
 
@@ -52,6 +61,8 @@ class RFIDObject(object):
 
 
 class RFIDReader(object):
+    "Continuosly read tags coming from the serial device"
+
     def __init__(self, port="/dev/ttyUSB0", baudrate=9600):
         self.port = port
         self.baudrate = baudrate

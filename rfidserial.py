@@ -24,12 +24,15 @@ class RFIDObject(object):
     def __init__(self, rawbytes):
         self.rawbytes = rawbytes
 
+    def __str__(self):
+        return self.get_readable_tag()
+
     def is_valid(self):
         # TODO: checksum
         return self.rawbytes[0] == START_BYTE and \
                self.rawbytes[-1] == STOP_BYTE
 
-    def readable_tag(self):
+    def get_readable_tag(self):
         string = []
         for x in self.get_rfid_tag():
             if x < 10:
@@ -99,9 +102,9 @@ class RFIDReader(object):
         checksum = rfid.calc_checksum()
 
         print "TAG: %s CALCULATED CHECKSUM: %s (data checksum: 0x%s)" % (
-            rfid.readable_tag(),
+            rfid,
             hex(checksum),
-            (raw[11],raw[12]),
+            (raw[11] + raw[12]),
         )
 
 
@@ -127,7 +130,7 @@ def test():
 
     assert(rfid.is_valid() == True)
     assert(rfid.get_rfid_tag() == tag_orig)
-    assert(rfid.readable_tag() == tag_orig_string)
+    assert(rfid.get_readable_tag() == tag_orig_string)
     assert(rfid.calc_checksum() == checksum)
 
 if __name__ == "__main__":

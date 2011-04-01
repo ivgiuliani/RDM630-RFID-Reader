@@ -8,59 +8,47 @@ RFID_BYTES = 14
 START_BYTE = 0x02
 STOP_BYTE = 0x03
 
-def to_rawbytes(serial_string):
-    """
-    Convert the encoding coming from the serial port
-    to raw bytes for easier manipulation. (The serial
-    device sends bytes ascii-encoded, i.e.: 0xA is encoded
-    as 'A')
-    """
-    return [ord(x) for x in serial_string]
-
 class RFIDObject(object):
     """
     A single rfid read from the serial device
     """
     def __init__(self, rawbytes):
         self.rawbytes = rawbytes
+        self.start, self.stop = ord(rawbytes[0]), ord(rawbytes[-1])
+        self.tag = rawbytes[1:11]
+        self.checksum = rawbytes[11:13]
 
     def __str__(self):
-        return self.get_readable_tag()
+        return "".join(self.tag)
 
     def is_valid(self):
-        # TODO: checksum
-        return self.rawbytes[0] == START_BYTE and \
-               self.rawbytes[-1] == STOP_BYTE
+        """Returns true if both the packet is valid (the start
+        and stop bytes are correct) and the checksum matches
+        """
+        if self.start != START_BYTE or \
+           self.stop != STOP_BYTE:
+            return False
 
-    def get_readable_tag(self):
-        string = []
-        for x in self.get_rfid_tag():
-            if x < 10:
-                string.append(chr(ord('0') + x))
-            else:
-                string.append(chr(ord('A') + x - 10))
-        return "".join(string)
-    
+        checksum = self.calc_checksum()
+        data_checksum = int(self.rawbytes[11] + self.rawbytes[12], 16)
+        return checksum == data_checksum
+
+    def get_tag(self):
+        "Returns the current tag"
+        return "".join(self.tag)
+
     def calc_checksum(self):
-        TAG_LENGTH = 10
+        "Calculate string checksum"
         pairs = []
-        tag = self.get_rfid_tag()
-        for i in range(0, TAG_LENGTH, 2):
-            pairs.append(tag[i] * 16 + tag[i + 1])
-        return reduce(lambda x, y: x ^ y, pairs)
-    
-    def get_rfid_tag(self):
-        DEC_LETTER_BASE = 0x30
-        HEX_LETTER_BASE = 0x37
+        tag = self.get_tag()
+        for i in range(0, len(tag), 2):
+            pairs.append(tag[i] + tag[i + 1])
 
-        rfid_tag = []
-        for byte in self.rawbytes[1:11]:
-            if byte >= (HEX_LETTER_BASE + 0x0A):
-                rfid_tag.append(byte - HEX_LETTER_BASE)
-            else:
-                rfid_tag.append(byte - DEC_LETTER_BASE)
-
-        return rfid_tag
+        return int(pairs[0], 16) ^ \
+               int(pairs[1], 16) ^ \
+               int(pairs[2], 16) ^ \
+               int(pairs[3], 16) ^ \
+               int(pairs[4], 16)
 
 
 class RFIDReader(object):
@@ -84,7 +72,6 @@ class RFIDReader(object):
         try:
             while True:
                 self.query_device()
-                time.sleep(1)
         except KeyboardInterrupt:
             self.close()
 
@@ -93,18 +80,16 @@ class RFIDReader(object):
         if len(raw) != RFID_BYTES:
             return
 
-        rfid = RFIDObject(to_rawbytes(raw))
+        rfid = RFIDObject(raw)
         if not rfid.is_valid():
-            print "INVALID"
+            # invalid read, ignore
             return
 
-        tag = rfid.get_rfid_tag()
+        tag = rfid.get_tag()
         checksum = rfid.calc_checksum()
 
-        print "TAG: %s CALCULATED CHECKSUM: %s (data checksum: 0x%s)" % (
-            rfid,
-            hex(checksum),
-            (raw[11] + raw[12]),
+        print "received tag: %s (checksum: %s)" % (
+            rfid, hex(checksum)
         )
 
 
@@ -123,14 +108,13 @@ def main(args):
 def test():
     tag_orig = [0x6, 0x2, 0xe, 0x3, 0x0, 0x8, 0x6, 0xC, 0xE, 0xD]
     tag_orig_string = "62E3086CED"
-    data = [0x02, 0x36, 0x32, 0x45, 0x33, 0x30, 0x38, 0x36, 0x43, 0x45, 0x44, 0x04, 0x0A, 0x03]
+    data = ['\x02', '6', '2', 'E', '3', '0', '8', '6', 'C', 'E', 'D', '0', '8', '\x03']
     checksum = 0x08
 
     rfid = RFIDObject(data)
 
     assert(rfid.is_valid() == True)
-    assert(rfid.get_rfid_tag() == tag_orig)
-    assert(rfid.get_readable_tag() == tag_orig_string)
+    assert(str(rfid) == tag_orig_string)
     assert(rfid.calc_checksum() == checksum)
 
 if __name__ == "__main__":

@@ -2,7 +2,6 @@
 
 import sys
 import serial
-import time
 
 RFID_STRING_LENGTH = 14
 

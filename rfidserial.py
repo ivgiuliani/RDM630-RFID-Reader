@@ -20,7 +20,7 @@ class RFIDObject(object):
         self.checksum = rawbytes[11:13]
 
     def __str__(self):
-        return "".join(self.tag)
+        return self.get_tag()
 
     def is_valid(self):
         """Returns true if both the packet is valid (the start

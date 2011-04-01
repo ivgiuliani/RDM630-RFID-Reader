@@ -4,11 +4,12 @@ import sys
 import serial
 import time
 
-RFID_BYTES = 14
-START_BYTE = 0x02
-STOP_BYTE = 0x03
+RFID_STRING_LENGTH = 14
 
 class RFIDObject(object):
+    START_BYTE = 0x02
+    STOP_BYTE = 0x03
+
     """
     A single rfid read from the serial device
     """
@@ -25,8 +26,8 @@ class RFIDObject(object):
         """Returns true if both the packet is valid (the start
         and stop bytes are correct) and the checksum matches
         """
-        if self.start != START_BYTE or \
-           self.stop != STOP_BYTE:
+        if self.start != RFIDObject.START_BYTE or \
+           self.stop  != RFIDObject.STOP_BYTE:
             return False
 
         checksum = self.calc_checksum()
@@ -76,8 +77,8 @@ class RFIDReader(object):
             self.close()
 
     def query_device(self):
-        raw = self.dev.read(RFID_BYTES)
-        if len(raw) != RFID_BYTES:
+        raw = self.dev.read(RFID_STRING_LENGTH)
+        if len(raw) != RFID_STRING_LENGTH:
             return
 
         rfid = RFIDObject(raw)

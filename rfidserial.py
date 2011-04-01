@@ -74,11 +74,8 @@ class RFIDReader(object):
         when there's some data available. The data passed
         to `callback` is already converted to an RFIDObject
         """
-        try:
-            while True:
-                callback(self.query_device())
-        except KeyboardInterrupt:
-            self.close()
+        while True:
+            callback(self.query_device())
 
     def query_device(self):
         raw = self.dev.read(RFID_STRING_LENGTH)
@@ -107,7 +104,10 @@ def main(args):
     port = args[1]
     reader = RFIDReader(port)
     reader.open()
-    reader.run(sample_callback)
+    try:
+        reader.run(sample_callback)
+    except KeyboardInterrupt:
+        reader.close()
 
     return False
 

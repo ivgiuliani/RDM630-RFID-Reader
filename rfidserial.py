@@ -69,10 +69,14 @@ class RFIDReader(object):
     def close(self):
         self.dev.close()
 
-    def run(self):
+    def run(self, callback):
+        """Constantly query the device and call `callback`
+        when there's some data available. The data passed
+        to `callback` is already converted to an RFIDObject
+        """
         try:
             while True:
-                self.query_device()
+                callback(self.query_device())
         except KeyboardInterrupt:
             self.close()
 
@@ -86,13 +90,14 @@ class RFIDReader(object):
             # invalid read, ignore
             return
 
-        tag = rfid.get_tag()
-        checksum = rfid.calc_checksum()
+        return rfid
 
-        print "received tag: %s (checksum: %s)" % (
-            rfid, hex(checksum)
-        )
 
+def sample_callback(rfid):
+    print "received tag: %s (checksum: %s)" % (
+        rfid,
+        hex(rfid.calc_checksum())
+    )
 
 def main(args):
     if len(args) != 2:
@@ -102,7 +107,7 @@ def main(args):
     port = args[1]
     reader = RFIDReader(port)
     reader.open()
-    reader.run()
+    reader.run(sample_callback)
 
     return False
 

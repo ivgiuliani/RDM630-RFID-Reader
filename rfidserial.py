@@ -10,7 +10,18 @@ STOP_BYTE = 0x03
 
 class RFIDReader(object):
     def __init__(self, port="/dev/ttyUSB0", baudrate=9600):
-        self.dev = serial.Serial(port, 9600, bytesize=8, parity='N', stopbits=1)
+        self.port = port
+        self.baudrate = baudrate
+
+    def open(self):
+        self.dev = serial.Serial(self.port,
+                                 self.baudrate,
+                                 bytesize=8,
+                                 parity='N',
+                                 stopbits=1)
+
+    def close(self):
+        self.dev.close()
 
     def run(self):
         try:
@@ -18,7 +29,7 @@ class RFIDReader(object):
                 self.query_device()
                 time.sleep(1)
         except KeyboardInterrupt:
-            self.dev.close()
+            self.close()
 
     def query_device(self):
         raw = self.dev.read(RFID_BYTES)
@@ -51,7 +62,7 @@ def calc_checksum(rfid_tag):
     pairs = []
     for i in range(0, 10, 2):
         pairs.append(rfid_tag[i] * 16 + rfid_tag[i + 1])
-    return pairs[0] ^ pairs[1] ^ pairs[2] ^ pairs[3] ^ pairs[4]
+    return reduce(lambda x, y: x ^ y, pairs)
 
 def get_rfid_tag(rawbytes):
     DEC_LETTER_BASE = 0x30
@@ -73,6 +84,7 @@ def main(args):
 
     port = args[1]
     reader = RFIDReader(port)
+    reader.open()
     reader.run()
 
     return False

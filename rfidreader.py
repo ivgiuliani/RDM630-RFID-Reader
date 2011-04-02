@@ -141,7 +141,7 @@ def main(args):
         port = autodiscover()
 
     if not port:
-        sys.stderr.write("cannot discover serial device")
+        sys.stderr.write("Couldn't autodiscover serial device\n")
         return True
 
     reader = RFIDReader(port)

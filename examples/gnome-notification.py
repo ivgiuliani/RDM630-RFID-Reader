@@ -49,7 +49,7 @@ def main(args):
     reader = RFIDReader(port)
     reader.open()
     try:
-        reader.run(callback)
+        reader.poll(callback)
     except KeyboardInterrupt:
         reader.close()
 

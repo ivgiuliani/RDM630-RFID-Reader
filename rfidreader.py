@@ -70,7 +70,7 @@ class RFIDReader(object):
         if self.dev:
             self.dev.close()
 
-    def run(self, callback):
+    def poll(self, callback):
         """Constantly query the device and call `callback`
         when there's some data available. The data passed
         to `callback` is already converted to an RFIDObject
@@ -106,7 +106,7 @@ def main(args):
     reader = RFIDReader(port)
     reader.open()
     try:
-        reader.run(sample_callback)
+        reader.poll(sample_callback)
     except KeyboardInterrupt:
         reader.close()
 

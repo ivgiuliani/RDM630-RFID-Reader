@@ -8,14 +8,25 @@ global python path and copy this module to /lib/security (and add
 your tags in ~/.rfidtags, one per line).
 
 Then you should configure PAM. If you want to authenticate *only*
-with rfid then add the following lines before anything else in
+with rfid then add the following line before anything else in
 /etc/pam.d/common-auth (on ubuntu systems):
 
   auth sufficient pam_python.so pam_rfidauth.py
+
+and make sure that:
+
   auth required pam_deny.so
+  auth required pam_permit.so
+
+appear (in that order) after the pam_rfidauth line.
 
 If you want to fallback on password authentication on rfid failure
-then just remove the second line.
+then use the following setup:
+
+  auth sufficient pam_python.so pam_rfidauth.py
+  auth [success=2 default=ignore] pam_unix.so nullok_secure
+  auth required pam_deny.so
+  auth required pam_permit.so
 """
 
 import os

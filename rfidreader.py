@@ -156,7 +156,6 @@ def main(args):
     return False
 
 def test():
-    tag_orig = [0x6, 0x2, 0xe, 0x3, 0x0, 0x8, 0x6, 0xC, 0xE, 0xD]
     tag_orig_string = "62E3086CED"
     data = ['\x02', '6', '2', 'E', '3', '0', '8', '6', 'C', 'E', 'D', '0', '8', '\x03']
     checksum = 0x08

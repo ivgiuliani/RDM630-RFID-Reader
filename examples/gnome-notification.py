@@ -6,7 +6,7 @@ tag is received
 
 import sys
 import pynotify
-from rfidreader import RFIDReader
+import rfidreader
 
 capabilities = {'actions':             False,
                 'body':                False,
@@ -42,11 +42,15 @@ def main(args):
     try:
         port = args[1]
     except IndexError:
+        port = None
+
+    port = port or rfidreader.autodiscover()
+    if not port:
         print "Usage: %s <port>" % args[0]
         return True
 
     init_pynotify()
-    reader = RFIDReader(port)
+    reader = rfidreader.RFIDReader(port)
     reader.open()
     try:
         reader.poll(callback)

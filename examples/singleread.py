@@ -5,7 +5,7 @@ most TIMEOUT_SECONDS
 """
 
 import sys
-from rfidreader import RFIDReader
+import rfidreader
 
 TIMEOUT_SECONDS = 5
 
@@ -13,10 +13,14 @@ def main(args):
     try:
         port = args[1]
     except IndexError:
+        port = None
+
+    port = port or rfidreader.autodiscover()
+    if not port:
         print "Usage: %s <port>" % args[0]
         return True
 
-    reader = RFIDReader(port)
+    reader = rfidreader.RFIDReader(port)
     reader.open()
     rfid = reader.single_read(timeout=TIMEOUT_SECONDS)
     if not rfid:

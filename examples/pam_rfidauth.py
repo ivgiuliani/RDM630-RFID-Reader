@@ -37,6 +37,8 @@ def authenticate(username, rfid_tag):
 def read_tag(port=None, timeout=TIMEOUT_SECONDS):
     "Read a rfid tag from the rfid reader"
     port = port or rfidreader.autodiscover()
+    if not port:
+        return None
 
     reader = rfidreader.RFIDReader(port)
     reader.open()

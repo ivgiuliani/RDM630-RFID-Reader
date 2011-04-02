@@ -61,6 +61,10 @@ def pam_sm_authenticate(pamh, flags, argv):
     except IndexError:
         port = None
 
+    # gnome-screensaver don't support this message
+    # and will ask for a password anyway, yielding a
+    # PamException conversation error
+    # pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, "Pass your RFID tag"))
     rfid = read_tag(port=port)
     if not rfid:
         return pamh.PAM_AUTH_ERR

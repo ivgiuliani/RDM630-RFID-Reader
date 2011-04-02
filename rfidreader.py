@@ -76,7 +76,7 @@ class RFIDReader(object):
         """
         self.dev.timeout = timeout
         while True:
-            callback(self.query_device())
+            callback(self.__query_device())
 
     def single_read(self, timeout=0):
         """Blocks until a single item is read from the device.
@@ -84,9 +84,9 @@ class RFIDReader(object):
         most `timeout` seconds. If timeout expires (i.e.: no
         value has been read) then it will return None.
         """
-        return self.query_device(timeout=timeout)
+        return self.__query_device(timeout=timeout)
 
-    def query_device(self, timeout = 0):
+    def __query_device(self, timeout = 0):
         assert(timeout >= 0)
         if timeout == 0:
             self.dev.timeout = None

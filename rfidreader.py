@@ -78,7 +78,21 @@ class RFIDReader(object):
         while True:
             callback(self.query_device())
 
-    def query_device(self):
+    def single_read(self, timeout=0):
+        """Blocks until a single item is read from the device.
+        If `timeout` is greater than 0 then it will wait at
+        most `timeout` seconds. If timeout expires (i.e.: no
+        value has been read) then it will return None.
+        """
+        return self.query_device(timeout=timeout)
+
+    def query_device(self, timeout = 0):
+        assert(timeout >= 0)
+        if timeout == 0:
+            self.dev.timeout = None
+        else:
+            self.dev.timeout = timeout
+
         raw = self.dev.read(RFID_STRING_LENGTH)
         if len(raw) != RFID_STRING_LENGTH:
             return

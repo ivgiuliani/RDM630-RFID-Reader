@@ -52,7 +52,7 @@ class RFIDObject(object):
 
 
 class RFIDReader(object):
-    "Continuosly read tags coming from the serial device"
+    "Read tags coming from the serial device"
 
     def __init__(self, port="/dev/ttyUSB0", baudrate=9600):
         self.port = port

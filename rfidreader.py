@@ -127,10 +127,13 @@ class RFIDReader(object):
 
 
 def sample_callback(rfid):
-    print "received tag: %s (checksum: %s)" % (
-        rfid,
-        hex(rfid.calc_checksum())
-    )
+    if not rfid:
+        print "timeout!"
+    else:
+        print "received tag: %s (checksum: %s)" % (
+            rfid,
+            hex(rfid.calc_checksum())
+        )
 
 def main(args):
     if len(args) > 2:
@@ -149,7 +152,7 @@ def main(args):
     reader = RFIDReader(port)
     reader.open()
     try:
-        reader.poll(sample_callback)
+        reader.poll(sample_callback, 20)
     except KeyboardInterrupt:
         reader.close()
 

@@ -1,9 +1,28 @@
 #!/usr/bin/env python
 
+import os
 import sys
 import serial
 
 RFID_STRING_LENGTH = 14
+
+def autodiscover():
+    """Search the device through udev entries for a rdm630 and
+    return the serial device string if we can find one or None
+    otherwise"""
+    from pyudev import Context
+
+    context = Context()
+    path = None
+
+    for device in context.list_devices(subsystem="usb-serial"):
+        if device.driver == "ftdi_sio":
+            path = device["DEVPATH"].rsplit("/", 1)[1]
+            break
+
+    if not path:
+        return None
+    return os.path.join(context.device_path, path)
 
 class RFIDObject(object):
     "A single rfid read from the serial device"
@@ -112,11 +131,19 @@ def sample_callback(rfid):
     )
 
 def main(args):
-    if len(args) != 2:
-        print "Usage: %s <serialdevice>" % args[0]
+    if len(args) > 2:
+        print "Usage: %s [<serialdevice>]" % args[0]
         return True
 
-    port = args[1]
+    try:
+        port = args[1]
+    except IndexError:
+        port = autodiscover()
+
+    if not port:
+        sys.stderr.write("cannot discover serial device")
+        return True
+
     reader = RFIDReader(port)
     reader.open()
     try:

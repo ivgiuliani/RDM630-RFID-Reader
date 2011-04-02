@@ -75,6 +75,7 @@ class RFIDReader(object):
         when there's some data available. The data passed
         to `callback` is already converted to an RFIDObject
         """
+        self.dev.timeout = None
         while True:
             callback(self.query_device())
 

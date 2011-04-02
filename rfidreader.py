@@ -6,12 +6,11 @@ import serial
 RFID_STRING_LENGTH = 14
 
 class RFIDObject(object):
+    "A single rfid read from the serial device"
+
     START_BYTE = 0x02
     STOP_BYTE = 0x03
 
-    """
-    A single rfid read from the serial device
-    """
     def __init__(self, rawbytes):
         self.rawbytes = rawbytes
         self.start, self.stop = ord(rawbytes[0]), ord(rawbytes[-1])

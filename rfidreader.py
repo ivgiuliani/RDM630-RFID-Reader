@@ -57,17 +57,9 @@ class RFIDObject(object):
 
     def calc_checksum(self):
         "Calculate string checksum"
-        pairs = []
         tag = self.get_tag()
-        for i in range(0, len(tag), 2):
-            pairs.append(tag[i] + tag[i + 1])
-
-        return int(pairs[0], 16) ^ \
-               int(pairs[1], 16) ^ \
-               int(pairs[2], 16) ^ \
-               int(pairs[3], 16) ^ \
-               int(pairs[4], 16)
-
+        pairs = [tag[i] + tag[i + 1] for i in range(0, len(tag), 2)]
+        return reduce(lambda x, y: x ^ y, map(lambda x: int(x, 16), pairs))
 
 class RFIDReader(object):
     "Read tags coming from the serial device"

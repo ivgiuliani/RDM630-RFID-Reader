@@ -74,10 +74,16 @@ def pam_sm_authenticate(pamh, flags, argv):
     except IndexError:
         port = None
 
-    # gnome-screensaver don't support this message
-    # and will ask for a password anyway, yielding a
-    # PamException conversation error
-    # pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, "Pass your RFID tag"))
+    try:
+        pamh.conversation(pamh.Message(pamh.PAM_TEXT_INFO, "Please pass your RFID tag"))
+    except pamh.exception:
+        # gnome-screensaver will raise a conversation exception in case
+        # of a missing keyboard input, we ignore that exception and 
+        # continue the auth process anyway. In this way gnome-screensaver
+        # will also disable the password textarea and only show our
+        # info message
+        pass
+
     rfid = read_tag(port=port)
     if not rfid:
         return pamh.PAM_AUTH_ERR

@@ -90,10 +90,10 @@ class RFIDReader(object):
 
     def poll(self, callback, timeout=0):
         """Constantly query the device and call `callback`
-        when there's some data available. The data passed
-        to `callback` is already converted to an RFIDObject
+        when there's some data available or the timeout expires.
+        The data passed to `callback` is already converted to
+        an RFIDObject or is None if the timeout has expired
         """
-        self.dev.timeout = timeout
         while True:
             callback(self.__query_device(timeout=timeout))
 

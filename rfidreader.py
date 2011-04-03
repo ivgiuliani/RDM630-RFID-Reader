@@ -11,6 +11,7 @@ import sys
 import serial
 
 RFID_STRING_LENGTH = 14
+USB_CONVERTER_PRODUCT_CODE = "403/6001/600"
 
 def autodiscover():
     """Search the device through udev entries for a rdm630 and
@@ -23,8 +24,9 @@ def autodiscover():
 
     for device in context.list_devices(subsystem="usb-serial"):
         if device.driver == "ftdi_sio":
-            path = device["DEVPATH"].rsplit("/", 1)[1]
-            break
+            if device.parent["PRODUCT"] == USB_CONVERTER_PRODUCT_CODE
+                path = device["DEVPATH"].rsplit("/", 1)[1]
+                break
 
     if not path:
         return None

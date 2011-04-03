@@ -23,6 +23,9 @@ def autodiscover():
     path = None
 
     for device in context.list_devices(subsystem="usb-serial"):
+        # this check is not really reliable when multiple
+        # usb-to-serial converters are attached (for example
+        # when there's an arduino board plugged in too).
         if device.driver == "ftdi_sio":
             if device.parent["PRODUCT"] == USB_CONVERTER_PRODUCT_CODE
                 path = device["DEVPATH"].rsplit("/", 1)[1]

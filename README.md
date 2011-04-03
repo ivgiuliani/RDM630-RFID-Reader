@@ -25,3 +25,4 @@ Requires pyinotify.
 This is probably the most interesting application example. It is a complete
 PAM authentication module for authentication through RFID tags.
 Configuration instructions are inside the source file.
+Requires libpam-python to work as a PAM authentication module.

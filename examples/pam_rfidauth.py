@@ -33,7 +33,7 @@ import os
 import sys
 import rfidreader
 
-TIMEOUT_SECONDS = 5
+TIMEOUT_SECONDS = 10
 
 def authenticate(username, rfid_tag):
     """Return true if the user has the given rfid tag stored

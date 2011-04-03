@@ -2,8 +2,8 @@ RDM630 125Khz RFID Reader
 =========================
 
 This is a python module for reading values from a RDM630 rfid receiver.
-It supports both a single read from the receiver and continuous polling
-(giving results back through callbacks).
+It supports both single read from the receiver and continuous polling,
+giving results back through callbacks.
 It also support autodiscovery of the reader (assuming there's only one
 plugged in).
 

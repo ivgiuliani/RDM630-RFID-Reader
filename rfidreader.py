@@ -13,6 +13,7 @@ import serial
 RFID_STRING_LENGTH = 14
 USB_CONVERTER_PRODUCT_CODE = "403/6001/600"
 
+
 def autodiscover():
     """Search the device through udev entries for a rdm630 and
     return the serial device string if we can find one or None
@@ -37,7 +38,7 @@ def autodiscover():
 
 
 class RFIDObject(object):
-    "A single rfid read from the serial device"
+    """A single rfid read from the serial device"""
 
     START_BYTE = 0x02
     STOP_BYTE = 0x03
@@ -64,18 +65,18 @@ class RFIDObject(object):
         return checksum == data_checksum
 
     def get_tag(self):
-        "Returns the current tag"
+        """Returns the current tag"""
         return "".join(self.tag)
 
     def calc_checksum(self):
-        "Calculate string checksum"
+        """Calculate string checksum"""
         tag = self.get_tag()
         pairs = [tag[i] + tag[i + 1] for i in range(0, len(tag), 2)]
         return reduce(lambda x, y: x ^ y, (int(x, 16) for x in pairs))
 
 
 class RFIDReader(object):
-    "Read tags coming from the serial device"
+    """Read tags coming from the serial device"""
 
     def __init__(self, port="/dev/ttyUSB0", baudrate=9600):
         self.port = port
@@ -83,7 +84,7 @@ class RFIDReader(object):
         self.baudrate = baudrate
 
     def open(self):
-        "Open the reader's serial port"
+        """Open the reader's serial port"""
         self.dev = serial.Serial(self.port,
                                  self.baudrate,
                                  bytesize=8,
@@ -91,7 +92,7 @@ class RFIDReader(object):
                                  stopbits=1)
 
     def close(self):
-        "Close the reader's serial port"
+        """Close the reader's serial port"""
         if self.dev:
             self.dev.close()
 
@@ -114,7 +115,7 @@ class RFIDReader(object):
         """
         return self.__query_device(timeout=timeout)
 
-    def __query_device(self, timeout = 0):
+    def __query_device(self, timeout=0):
         """Awaits for data from the reader. Blocks until some
         data is received if `timeout` = 0, or wait at most `timeout`
         seconds if a timeout is specified. In case of timeout
@@ -139,7 +140,7 @@ class RFIDReader(object):
 
 
 def sample_callback(rfid):
-    "A small example callback"
+    """A small example callback"""
     if not rfid:
         print "timeout!"
     else:
@@ -148,8 +149,9 @@ def sample_callback(rfid):
             hex(rfid.calc_checksum())
         )
 
+
 def main(args):
-    "Run a sample reader program"
+    """Run a sample reader program"""
     if len(args) > 2:
         print "Usage: %s [<serialdevice>]" % args[0]
         return True
@@ -172,19 +174,21 @@ def main(args):
 
     return False
 
+
 def test():
-    "Some tests"
+    """Some tests"""
     tag_orig_string = "62E3086CED"
-    data = ['\x02',                                           # start byte
-            '6', '2', 'E', '3', '0', '8', '6', 'C', 'E', 'D', # tag
-            '0', '8',                                         # checksum
-            '\x03'                                            # stop byte
+    data = [
+        '\x02',                                            # start byte
+        '6', '2', 'E', '3', '0', '8', '6', 'C', 'E', 'D',  # tag
+        '0', '8',                                          # checksum
+        '\x03'                                             # stop byte
     ]
     checksum = 0x08
 
     rfid = RFIDObject(data)
 
-    assert(rfid.is_valid() == True)
+    assert(rfid.is_valid() is True)
     assert(str(rfid) == tag_orig_string)
     assert(rfid.calc_checksum() == checksum)
 

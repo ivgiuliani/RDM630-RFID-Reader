@@ -56,8 +56,7 @@ class RFIDObject(object):
         """Returns true if both the packet is valid (the start
         and stop bytes are correct) and the checksum matches
         """
-        if self.start != RFIDObject.START_BYTE or \
-           self.stop  != RFIDObject.STOP_BYTE:
+        if self.start != self.START_BYTE or self != self.STOP_BYTE:
             return False
 
         checksum = self.calc_checksum()
